@@ -1,5 +1,4 @@
 import { auth } from '@clerk/nextjs/server';
-import { NextRequest } from 'next/server';
 
 export async function validateAuth() {
   try {

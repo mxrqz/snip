@@ -1,11 +1,10 @@
 'use client';
 
 import { UserButton, useAuth, useUser } from '@clerk/nextjs';
-import { useFirebaseAuth } from '@/app/hooks/useFirebaseAuth';
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { signInWithCustomToken } from "firebase/auth";
 import { auth } from "../utils/firebase/firebase";
-import { SnipLogoS, SnipLogoCompleta } from "./snip-logos";
+import { SnipLogoCompleta } from "./snip-logos";
 
 export function Header() {
   const { isLoaded } = useAuth();

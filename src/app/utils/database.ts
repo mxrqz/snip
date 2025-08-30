@@ -1,6 +1,6 @@
 import { db } from '@/app/utils/firebase/admin';
-import { FieldValue } from 'firebase-admin/firestore';
-import { Timestamp } from "firebase/firestore";
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+
 
 export interface LinkData {
   shortCode: string;
@@ -8,7 +8,7 @@ export interface LinkData {
   shortUrl: string;
   analyticsUrl: string;
   userId: string;
-  createdAt: Timestamp;
+  createdAt: Timestamp | FieldValue;
   expiresAt: string | null;
   clicks: number;
 }
@@ -141,16 +141,31 @@ export async function getUserStats(userId: string) {
 
     let totalClicks = 0;
     let todayClicks = 0;
-    const today = new Date().toDateString();
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
     linksSnapshot.docs.forEach(doc => {
       const linkData = doc.data() as LinkData;
       totalClicks += linkData.clicks || 0;
       
-      // TODO: Implementar contador de cliques diários
-      // Para MVP, assumir que todos os cliques são de hoje
-      if (linkData.createdAt && new Date(linkData.createdAt).toDateString() === today) {
-        todayClicks += linkData.clicks || 0;
+      // Verificar se o link foi criado hoje
+      if (linkData.createdAt) {
+        let linkDate: Date | null = null;
+        
+        if (linkData.createdAt instanceof Timestamp) {
+          linkDate = linkData.createdAt.toDate();
+        } else if (typeof linkData.createdAt === 'object' && '_seconds' in linkData.createdAt) {
+          // Caso seja um timestamp serializado
+          linkDate = new Date((linkData.createdAt as { _seconds: number })._seconds * 1000);
+        }
+        
+        if (linkDate) {
+          const linkDateStart = new Date(linkDate.getFullYear(), linkDate.getMonth(), linkDate.getDate());
+          
+          if (linkDateStart.getTime() === todayStart.getTime()) {
+            todayClicks += linkData.clicks || 0;
+          }
+        }
       }
     });
 

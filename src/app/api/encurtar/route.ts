@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validateAuth } from '@/app/utils/auth';
 import { generateShortCode, isValidUrl, buildShortUrl, buildAnalyticsUrl } from '@/app/utils/urlShortener';
 import { saveLinkData, LinkData } from '@/app/utils/database';
+import { FieldValue } from "firebase-admin/firestore";
 
 export async function GET(request: NextRequest) {
   try {
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
       shortUrl,
       analyticsUrl,
       userId: authResult.userId!,
-      createdAt: new Date().toISOString(),
+      createdAt: FieldValue.serverTimestamp(),
       expiresAt: null,
       clicks: 0
     };

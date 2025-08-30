@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { validateAuth } from '@/app/utils/auth';
 import { getUserStats } from '@/app/utils/database';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const authResult = await validateAuth();
     if (!authResult.isValid) {

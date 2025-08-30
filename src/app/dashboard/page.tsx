@@ -33,7 +33,6 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { LinkData, PaginatedLinks } from '@/app/utils/database';
-import { Timestamp } from 'firebase/firestore';
 
 
 interface UserStats {
@@ -48,6 +47,7 @@ export default function Dashboard() {
   const [links, setLinks] = useState<LinkData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [newUrl, setNewUrl] = useState('');
@@ -62,7 +62,7 @@ export default function Dashboard() {
         setStats(data.data);
       }
     } catch (error) {
-      toast.error('Erro ao carregar estatísticas');
+      toast.error(`Erro ao carregar estatísticas ${error}`);
     }
   };
 
@@ -79,7 +79,7 @@ export default function Dashboard() {
         setTotalPages(Math.ceil(result.totalCount / 20));
       }
     } catch (error) {
-      toast.error('Erro ao carregar links');
+      toast.error(`Erro ao carregar links ${error}`);
     } finally {
       setLoading(false);
     }
@@ -105,7 +105,7 @@ export default function Dashboard() {
         toast.error(data.error || 'Erro ao criar link');
       }
     } catch (error) {
-      toast.error('Erro ao criar link');
+      toast.error(`Erro ao criar link ${error}`);
     } finally {
       setCreating(false);
     }
@@ -116,19 +116,19 @@ export default function Dashboard() {
       await navigator.clipboard.writeText(text);
       toast.success('Copiado para área de transferência!');
     } catch (error) {
-      toast.error('Erro ao copiar');
+      toast.error(`Erro ao copiar ${error}`);
     }
   };
 
-  const formatDate = (date: Timestamp | { _seconds: number; _nanoseconds: number } | string | Date | null) => {
+  const formatDate = (date: unknown) => {
     // Firestore serializado via API: {_seconds: number, _nanoseconds: number}
     if (date && typeof date === 'object' && '_seconds' in date) {
-      return new Date(date._seconds * 1000).toLocaleDateString('pt-BR');
+      return new Date((date as { _seconds: number })._seconds * 1000).toLocaleDateString('pt-BR');
     }
     
     // Timestamp real do Firestore (raro via API)
-    if (date instanceof Timestamp) {
-      return date.toDate().toLocaleDateString('pt-BR');
+    if (date && typeof date === 'object' && 'toDate' in date) {
+      return (date as { toDate: () => Date }).toDate().toLocaleDateString('pt-BR');
     }
     
     // Outros formatos (string, Date, etc)
