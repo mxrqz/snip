@@ -1,17 +1,6 @@
 import { db } from '@/app/utils/firebase/admin';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
-
-
-export interface LinkData {
-  shortCode: string;
-  originalUrl: string;
-  shortUrl: string;
-  analyticsUrl: string;
-  userId: string;
-  createdAt: Timestamp | FieldValue;
-  expiresAt: string | null;
-  clicks: number;
-}
+import { LinkData } from "../types/types";
 
 export async function getOriginalUrl(shortCode: string): Promise<string | null> {
   try {

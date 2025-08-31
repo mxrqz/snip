@@ -3,6 +3,7 @@
         "adminsdk",
         "fbsvc",
         "firestore",
-        "Firestore"
+        "Firestore",
+        "saira"
     ]
 }

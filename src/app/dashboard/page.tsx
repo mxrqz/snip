@@ -6,34 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
-import { 
-  Link2, 
-  MousePointerClick, 
-  Calendar,
-  Copy,
-  ExternalLink,
-  BarChart3,
-  Plus
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { LinkData, PaginatedLinks } from '@/app/utils/database';
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '@/components/ui/table';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
+import { Link2, MousePointerClick, Calendar, Copy, ExternalLink, BarChart3, Plus } from 'lucide-react';
+import { LinkData } from '@/app/utils/database';
+import { copyToClipboard, formatDate } from "../utils/functions";
+import { fetchStats, fetchLinks, createLink } from '@/app/services/dashboardService';
 
 interface UserStats {
   totalLinks: number;
@@ -53,94 +31,33 @@ export default function Dashboard() {
   const [newUrl, setNewUrl] = useState('');
   const [creating, setCreating] = useState(false);
 
-  const fetchStats = async () => {
-    try {
-      const response = await fetch('/api/dashboard/stats');
-      const data = await response.json();
-      
-      if (data.success) {
-        setStats(data.data);
-      }
-    } catch (error) {
-      toast.error(`Erro ao carregar estatísticas ${error}`);
+  const handleFetchStats = async () => {
+    const result = await fetchStats();
+    if (result) {
+      setStats(result);
     }
   };
 
-  const fetchLinks = async (page: number) => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/dashboard/links?page=${page}&limit=20`);
-      const data = await response.json();
-      
-      if (data.success) {
-        const result: PaginatedLinks = data.data;
-        setLinks(result.links);
-        setTotalCount(result.totalCount);
-        setTotalPages(Math.ceil(result.totalCount / 20));
-      }
-    } catch (error) {
-      toast.error(`Erro ao carregar links ${error}`);
-    } finally {
-      setLoading(false);
+  const handleFetchLinks = async (page: number) => {
+    setLoading(true);
+    const result = await fetchLinks(page, 20);
+    if (result) {
+      setLinks(result.links);
+      setTotalCount(result.totalCount);
+      setTotalPages(Math.ceil(result.totalCount / 20));
     }
+    setLoading(false);
   };
 
-  const createLink = async () => {
-    if (!newUrl.trim()) {
-      toast.error('Digite uma URL válida');
-      return;
+  const handleCreateLink = async () => {
+    setCreating(true);
+    const result = await createLink(newUrl);
+    if (result.success) {
+      setNewUrl('');
+      await handleFetchStats();
+      await handleFetchLinks(currentPage);
     }
-
-    try {
-      setCreating(true);
-      const response = await fetch(`/api/encurtar?url=${encodeURIComponent(newUrl)}`);
-      const data = await response.json();
-      
-      if (data.success) {
-        toast.success('Link criado com sucesso!');
-        setNewUrl('');
-        await fetchStats();
-        await fetchLinks(currentPage);
-      } else {
-        toast.error(data.error || 'Erro ao criar link');
-      }
-    } catch (error) {
-      toast.error(`Erro ao criar link ${error}`);
-    } finally {
-      setCreating(false);
-    }
-  };
-
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast.success('Copiado para área de transferência!');
-    } catch (error) {
-      toast.error(`Erro ao copiar ${error}`);
-    }
-  };
-
-  const formatDate = (date: unknown) => {
-    // Firestore serializado via API: {_seconds: number, _nanoseconds: number}
-    if (date && typeof date === 'object' && '_seconds' in date) {
-      return new Date((date as { _seconds: number })._seconds * 1000).toLocaleDateString('pt-BR');
-    }
-    
-    // Timestamp real do Firestore (raro via API)
-    if (date && typeof date === 'object' && 'toDate' in date) {
-      return (date as { toDate: () => Date }).toDate().toLocaleDateString('pt-BR');
-    }
-    
-    // Outros formatos (string, Date, etc)
-    if (date) {
-      try {
-        return new Date(date as string | Date).toLocaleDateString('pt-BR');
-      } catch {
-        return 'Data inválida';
-      }
-    }
-    
-    return 'Data inválida';
+    setCreating(false);
   };
 
   const truncateUrl = (url: string, maxLength: number = 50) => {
@@ -149,8 +66,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (isLoaded && userId) {
-      fetchStats();
-      fetchLinks(1);
+      handleFetchStats();
+      handleFetchLinks(1);
     }
   }, [isLoaded, userId]);
 
@@ -163,7 +80,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Dashboard</h1>
@@ -220,9 +137,10 @@ export default function Dashboard() {
                 placeholder="Digite a URL que deseja encurtar..."
                 value={newUrl}
                 onChange={(e) => setNewUrl(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && createLink()}
+                onKeyDown={(e) => e.key === 'Enter' && handleCreateLink()}
               />
-              <Button onClick={createLink} disabled={creating}>
+              
+              <Button onClick={handleCreateLink} disabled={creating}>
                 {creating ? 'Criando...' : 'Encurtar'}
               </Button>
             </div>
@@ -337,7 +255,7 @@ export default function Dashboard() {
                               <PaginationLink
                                 onClick={() => {
                                   setCurrentPage(page);
-                                  fetchLinks(page);
+                                  handleFetchLinks(page);
                                 }}
                                 isActive={currentPage === page}
                                 className="cursor-pointer"
