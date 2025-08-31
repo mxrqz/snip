@@ -107,7 +107,7 @@ export function HowItWorks() {
       <div className="text-center mt-16">
         <Link href={isSignedIn ? '/dashboard' : '/login'}>
           <Button className="bg-foreground text-background group/modal-btn relative overflow-hidden hover:bg-foreground">
-            <span className="group-hover/modal-btn:translate-x-96 text-center transition duration-500">
+            <span className="group-hover/modal-btn:translate-x-96 text-center transition duration-500 flex gap-1">
               Comece Agora <span className="hidden md:block"> - Setup em poucos segundos</span>
             </span>
 
