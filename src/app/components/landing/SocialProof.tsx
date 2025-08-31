@@ -61,7 +61,7 @@ export function SocialProof() {
 
               {/* Content */}
               <p className="text-black mb-6 leading-relaxed">
-                "{testimonial.content}"
+                {testimonial.content}
               </p>
 
               {/* Author */}

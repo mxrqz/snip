@@ -9,9 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '@/components/ui/table';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
 import { Link2, MousePointerClick, Calendar, Copy, ExternalLink, BarChart3, Plus } from 'lucide-react';
-import { LinkData } from '@/app/utils/database';
 import { copyToClipboard, formatDate } from "../utils/functions";
 import { fetchStats, fetchLinks, createLink } from '@/app/services/dashboardService';
+import { LinkData } from "../types/types";
 
 interface UserStats {
   totalLinks: number;

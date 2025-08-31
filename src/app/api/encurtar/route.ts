@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateAuth } from '@/app/utils/auth';
 import { generateShortCode, isValidUrl, buildShortUrl, buildAnalyticsUrl } from '@/app/utils/urlShortener';
-import { saveLinkData, LinkData } from '@/app/utils/database';
+import { saveLinkData } from '@/app/utils/database';
 import { FieldValue } from "firebase-admin/firestore";
+import { LinkData } from "@/app/types/types";
 
 export async function GET(request: NextRequest) {
   try {

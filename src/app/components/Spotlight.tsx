@@ -4,6 +4,7 @@ import { copyToClipboard } from "@/app/utils/functions";
 import { createLink } from "@/app/services/dashboardService";
 import { CreateLinkResponse } from "@/app/types/types";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function Spotlight({isOpen}: {isOpen: boolean}) {
     const [input, setInput] = useState('');
