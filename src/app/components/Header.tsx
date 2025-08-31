@@ -5,11 +5,13 @@ import { useEffect } from "react";
 import { signInWithCustomToken } from "firebase/auth";
 import { auth } from "../utils/firebase/firebase";
 import { SnipLogoCompleta } from "./snip-logos";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function Header() {
   const { isLoaded } = useAuth();
   const { userId, getToken } = useAuth();
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
 
   useEffect(() => {
     if (!userId || !isLoaded) return
@@ -41,7 +43,15 @@ export function Header() {
         </div>
 
         <div className="flex items-center">
-          <UserButton />
+          {isSignedIn ? (
+            <UserButton />
+          ) : (
+            <Link href={"/login"}>
+              <Button className="bg-foreground text-background hover:text-foreground hover:bg-background">
+                Entrar
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </header>

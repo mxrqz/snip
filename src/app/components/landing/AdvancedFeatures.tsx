@@ -50,32 +50,41 @@ export default function AdvancedFeatures() {
                     return (
                         <div
                             key={index}
-                            className="relative bg-white p-6 rounded-2xl border-2 border-white hover:bg-gray-50 transition-all duration-300 group"
+                            className="relative rounded-2xl overflow-hidden border border-foreground/30"
                         >
                             {/* Badge */}
-                            <div className="absolute -top-2 -right-2 bg-black text-white text-xs px-2 py-1 rounded-full font-medium">
-                                {feature.badge}
+                            <div className="w-full top-0 left-0 flex justify-end">
+                                <span className="bg-foreground rounded-tr-md w-full" />
+
+                                {/* <span className="absolute top-0 right-0 bg-foreground rounded-tr-3xl p-1 shrink-0">
+                                    {feature.badge}
+                                </span> */}
+
+                                <span className="bg-foreground py-1 px-2 rounded-tr-3xl shrink-0 relative z-10 before:content-[''] before:w-full before:h-full before:absolute before:top-0 before:right-0 before:bg-background before:-z-10 before:rounded-bl-md before:rounded-tr-2xl ">
+                                    {feature.badge}
+                                </span>
                             </div>
 
-                            {/* Icon */}
-                            <div className="mb-4">
-                                <Icon className="w-8 h-8 text-black" />
-                            </div>
+                            <div className="bg-foreground pb-6 px-6">
+                                {/* Icon */}
+                                <div className="mb-4 bg-foreground">
+                                    <Icon className="w-8 h-8 text-background" />
+                                </div>
 
-                            {/* Content */}
-                            <h3 className="text-lg font-semibold text-black mb-3">
-                                {feature.title}
-                            </h3>
-                            <p className="text-black text-sm leading-relaxed">
-                                {feature.description}
-                            </p>
+                                {/* Content */}
+                                <h3 className="text-lg font-semibold bg-foreground text-background mb-3">
+                                    {feature.title}
+                                </h3>
+                                <p className="text-background bg-foreground text-sm leading-relaxed">
+                                    {feature.description}
+                                </p>
+                            </div>
                         </div>
                     );
                 })}
             </div>
 
             {/* Bottom CTA */}
-
             <Button className="w-fit bg-foreground text-background hover:bg-foreground">
                 <span>Seja notificado quando lançarmos</span>
                 <BellRing />

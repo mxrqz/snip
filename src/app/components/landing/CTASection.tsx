@@ -7,11 +7,11 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import { SnipLogoCompleta, SnipLogoS } from "../snip-logos";
+import { SnipLogoS } from "../snip-logos";
 
 export function CTASection() {
   const [email, setEmail] = useState('');
-  const [newsletterEmail, setNewsletterEmail] = useState('');
+  // const [newsletterEmail, setNewsletterEmail] = useState('');
 
   const handleGetStarted = () => {
     if (email.trim()) {
@@ -20,47 +20,47 @@ export function CTASection() {
     }
   };
 
-  const handleNewsletterSignup = () => {
-    if (newsletterEmail.trim()) {
-      toast.success('Email cadastrado! Você receberá novidades do Momentum.');
-      setNewsletterEmail('');
-    } else {
-      toast.error('Digite um email válido');
-    }
-  };
+  // const handleNewsletterSignup = () => {
+  //   if (newsletterEmail.trim()) {
+  //     toast.success('Email cadastrado! Você receberá novidades do Momentum.');
+  //     setNewsletterEmail('');
+  //   } else {
+  //     toast.error('Digite um email válido');
+  //   }
+  // };
 
   return (
-    <section className="flex flex-col text-center gap-10 w-full py-12 bg-foreground rounded-2xl" id="newsletter">
+    <section className="flex flex-col text-center gap-10 w-full py-12 px-5 bg-foreground rounded-2xl" id="newsletter">
       {/* Main CTA */}
       <div className="flex flex-col gap-3">
         <div className="flex gap-5 items-baseline w-full justify-center">
-          <h2 className="text-4xl md:text-6xl font-bold text-background">
+          <h2 className="text-3xl md:text-6xl font-bold text-background">
             Fique por dentro das novidades
           </h2>
 
-          <SnipLogoS className="h-12" />
+          <SnipLogoS className="h-12 hidden md:block" />
         </div>
 
-        <p className="text-xl text-background">
+        <p className="text-xl text-background text-pretty">
           Grandes novidades estão chegando! <br /> Receba updates exclusivos sobre o <Link href={"#"}><u>Momentum</u></Link> e nossos próximos lançamentos.
         </p>
       </div>
 
       <div className="flex flex-col gap-3 w-full">
         {/* Email Input */}
-        <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+        <div className="flex flex-col sm:flex-row gap-2 md:gap-4 w-full justify-center">
           <Input
             placeholder="Seu melhor email..."
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-1/2 text-foreground bg-background border-none focus-visible:ring-0 placeholder:text-foreground"
+            className="w-full md:w-1/2 text-foreground bg-background border-none focus-visible:ring-0 placeholder:text-foreground"
           />
 
           <Button
             onClick={handleGetStarted}
-            className="bg-black hover:bg-gray-800 text-white px-6"
+            className="bg-black hover:bg-gray-800 text-white px-6 items-center"
           >
-            Começar
+            Assinar
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>

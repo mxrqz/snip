@@ -8,12 +8,13 @@ export function Footer() {
 
   return (
     <footer className="w-full text-foreground/60 py-4 font-extralight border-t [border-image:linear-gradient(90deg,#fff0,#fff3_25%,#fff6_75%,#fff0)_1]">
+
       <div className="flex flex-col gap-5 max-w-7xl mx-auto w-full">
         {/* Main Content */}
-        <div className="w-full flex justify-between">
+        <div className="w-full flex flex-col gap-5 md:flex-row justify-between">
 
           {/* Left Column - Logo & Description */}
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4 items-start">
             <SnipLogoCompleta className="h-8 fill-foreground" />
 
             <p className="max-w-md leading-relaxed text-sm">
@@ -24,8 +25,8 @@ export function Footer() {
           </div>
 
           {/* Right Column - Legal Links */}
-          <div className="flex gap-10 h-fit text-sm">
-            <div className="flex flex-col gap-5">
+          <div className="flex flex-col md:flex-row w-full md:w-fit items-center gap-5 md:gap-10 h-fit text-sm">
+            <div className="w-full items-center flex flex-col gap-5">
               <Link
                 href="/termos"
                 className="text-accent-foreground hover:text-foreground/30 h-fit"
@@ -41,7 +42,7 @@ export function Footer() {
               </Link>
             </div>
 
-            <div className="flex flex-col gap-5">
+            <div className="w-full items-center flex flex-col gap-5">
               <Link
                 href="/cancelamento"
                 className="text-accent-foreground hover:text-foreground/30 h-fit"
@@ -60,10 +61,11 @@ export function Footer() {
         </div>
 
         {/* Bottom Copyright */}
-        <p className="w-full text-sm text-accent-foreground">
+        <p className="w-full text-sm text-center md:text-start text-accent-foreground">
           © {currentYear} Snip. Todos os direitos reservados.
         </p>
       </div>
+      
     </footer>
   );
 }

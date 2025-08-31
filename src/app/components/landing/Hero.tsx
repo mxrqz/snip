@@ -10,19 +10,21 @@ export function Hero() {
   const { isLoaded, isSignedIn } = useUser()
 
   return (
-    <section className="flex gap-16 items-center w-full">
+    <section className="flex flex-col md:flex-row gap-16 items-center w-full">
       {/* Left Column - Content */}
-      <div className="text-left flex-1 w-full">
-        <h1 className={`text-5xl font-bold text-white mb-4 leading-tight`}>
-          Encurte. Compartilhe. Gerencie.
-        </h1>
+      <div className="text-left flex-1 w-full flex flex-col gap-5">
+        <div className="flex flex-col gap-3">
+          <h1 className={`text-5xl font-bold text-white  leading-tight`}>
+            Encurte. Compartilhe. Gerencie.
+          </h1>
 
-        <p className={`text-2xl text-white mb-8 leading-relaxed`}>
-          Cole, clique e pronto.
-        </p>
+          <p className={`text-2xl text-white  leading-relaxed`}>
+            Cole, clique e pronto.
+          </p>
+        </div>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row gap-4">
           <Link href={isLoaded && isSignedIn ? '/dashboard' : '/login'}>
             <Button size="lg" className="bg-white text-black hover:bg-gray-300 px-8 py-4 text-lg font-semibold">
               Começar Agora
@@ -32,19 +34,19 @@ export function Hero() {
         </div>
 
         {/* Features */}
-        <div className="flex items-center gap-8 text-white">
+        <div className="flex items-start  gap-8 text-foreground">
           <div>
-            <span className="text-2xl font-bold">QR Code</span>
+            <span className="text-lg md:text-2xl font-bold">QR Code</span>
             <p className="text-sm">Para cada link</p>
           </div>
 
           <div>
-            <span className="text-2xl font-bold">Analytics</span>
+            <span className="text-lg md:text-2xl font-bold">Analytics</span>
             <p className="text-sm">Completos</p>
           </div>
 
           <div>
-            <span className="text-2xl font-bold">Grátis</span>
+            <span className="text-lg md:text-2xl font-bold">Grátis</span>
             <p className="text-sm">Para sempre</p>
           </div>
         </div>

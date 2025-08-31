@@ -4,7 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { ThemeProvider } from "./components/ThemeProvider";
-import { shadcn } from "@clerk/themes";
+// import { shadcn } from "@clerk/themes";
 import { Toaster } from "@/components/ui/sonner";
 
 import { Saira } from 'next/font/google';
@@ -22,13 +22,13 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider
-      appearance={{
-        theme: shadcn
-      }}
+      // appearance={{
+      //   theme: shadcn
+      // }}
     >
       <html lang="pt-BR" suppressHydrationWarning>
         <body
-          className={`${saira.className} antialiased bg-background flex flex-col w-full`}
+          className={`${saira.className} antialiased bg-background flex flex-col px-10 w-full`}
         >
           <ThemeProvider
             attribute="class"

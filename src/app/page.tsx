@@ -3,7 +3,7 @@
 import { Hero } from '@/app/components/landing/Hero';
 import { HowItWorks } from '@/app/components/landing/HowItWorks';
 import { Features } from '@/app/components/landing/Features';
-import { SocialProof } from '@/app/components/landing/SocialProof';
+// import { SocialProof } from '@/app/components/landing/SocialProof';
 import { CTASection } from '@/app/components/landing/CTASection';
 
 import { useSpotlightShortcut } from '@/app/hooks/useShortcuts';
@@ -22,7 +22,7 @@ export default function Home() {
   });
 
   return (
-    <main className={`bg-background relative flex flex-col gap-48 items-center w-full max-w-7xl mx-auto py-20`}>
+    <main className={`bg-background relative flex flex-col gap-32 md:gap-48 items-center w-full md:max-w-7xl md:mx-auto py-20`}>
       <Hero />
       <HowItWorks />
       <Features />
