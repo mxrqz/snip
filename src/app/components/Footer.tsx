@@ -7,7 +7,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full text-foreground/60 py-4 font-extralight border-t [border-image:linear-gradient(90deg,#fff0,#fff3_25%,#fff6_75%,#fff0)_1]">
+    <footer className="w-full text-foreground/60 py-4 font-extralight border-t [border-image:linear-gradient(90deg,#fff0,#fff3_25%,#fff6_75%,#fff0)_1] px-10 md:px-0">
 
       <div className="flex flex-col gap-5 max-w-7xl mx-auto w-full">
         {/* Main Content */}
