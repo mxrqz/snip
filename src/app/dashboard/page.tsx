@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '@/components/ui/table';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
-import { Link2, MousePointerClick, Calendar, Copy, ExternalLink, BarChart3, Plus } from 'lucide-react';
+import { Link2, MousePointerClick, Calendar, Copy, ExternalLink, BarChart3, Plus, HomeIcon, PlusIcon, SearchIcon } from 'lucide-react';
 import { copyToClipboard, formatDate } from "../utils/functions";
 import { fetchStats, fetchLinks, createLink } from '@/app/services/dashboardService';
 import { LinkData } from "../types/types";
@@ -16,6 +16,7 @@ import { QRCodeDialog } from '@/app/components/dashboard/QRCodeDialog';
 import { QRCodeDialogWithLogo } from "../components/dashboard/QRCodeDialogWithLogo";
 import { SearchDialog } from '@/app/components/dashboard/SearchDialog';
 import { useSearchShortcut } from '@/app/hooks/useShortcuts';
+import { FloatingDock } from "../components/FloatingDock";
 
 interface UserStats {
   totalLinks: number;
@@ -94,9 +95,27 @@ export default function Dashboard() {
     </div>;
   }
 
+  const navItems = [
+    {
+      title: "Home",
+      icon: <HomeIcon className="size-4"/>,
+      href: '#'
+    },
+    {
+      title: "Novo",
+      icon: <PlusIcon className="size-4"/>,
+      href: '#'
+    },
+    {
+      title: "Search",
+      icon: <SearchIcon className="size-4"/>,
+      href: '#'
+    },
+  ]
+
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background p-6 flex flex-col items-center w-full">
+      <div className="max-w-7xl mx-auto space-y-6 w-full">
 
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -353,6 +372,8 @@ export default function Dashboard() {
         onClose={() => setSearchDialogOpen(false)}
         links={links}
       />
+
+      <FloatingDock items={navItems} desktopClassName="sticky bottom-10" mobileClassName="fixed bottom-10 right-3" />
     </div>
   );
 }

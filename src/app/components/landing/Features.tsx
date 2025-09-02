@@ -23,7 +23,7 @@ export function Features() {
       {/* Features Grid */}
       <div className="hidden md:flex flex-col w-full gap-8">
         <div className="flex gap-8 w-full">
-          <div className="border rounded-2xl p-6 text-foreground bg-gradient-to-t from-background to-foreground/5">
+          <div className="border rounded-2xl p-6 text-foreground bg-gradient-to-t from-background to-neutral-950">
             <div className="mb-4">
               <Zap className="w-8 h-8" />
             </div>
@@ -37,7 +37,7 @@ export function Features() {
             </p>
           </div>
 
-          <div className="border rounded-2xl p-6 text-foreground bg-gradient-to-t from-background to-foreground/5">
+          <div className="border rounded-2xl p-6 text-foreground bg-gradient-to-t from-background to-neutral-950">
             <div className="mb-4">
               <BarChart3 className="w-8 h-8" />
             </div>
@@ -51,7 +51,7 @@ export function Features() {
             </p>
           </div>
 
-          <div className="border rounded-2xl p-6 text-foreground bg-gradient-to-t from-background to-foreground/5">
+          <div className="border rounded-2xl p-6 text-foreground bg-gradient-to-t from-background to-neutral-950">
             <div className="mb-4">
               <QrCode className="w-8 h-8" />
             </div>
@@ -67,7 +67,7 @@ export function Features() {
         </div>
 
         <div className="flex gap-8 w-full">
-          <div className="border rounded-2xl p-6 text-foreground bg-gradient-to-t from-background to-foreground/5">
+          <div className="border rounded-2xl p-6 text-foreground bg-gradient-to-t from-background to-neutral-950">
             <div className="mb-4">
               <Calendar className="w-8 h-8" />
             </div>
@@ -81,7 +81,7 @@ export function Features() {
             </p>
           </div>
 
-          <div className="border rounded-2xl p-6 text-foreground bg-gradient-to-t from-background to-foreground/5">
+          <div className="border rounded-2xl p-6 text-foreground bg-gradient-to-t from-background to-neutral-950">
             <div className="mb-4">
               <Search className="w-8 h-8" />
             </div>

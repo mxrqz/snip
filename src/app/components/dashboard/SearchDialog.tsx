@@ -27,6 +27,8 @@ export function SearchDialog({ isOpen, onClose, links }: SearchDialogProps) {
   const [selectedLink, setSelectedLink] = useState<LinkData | null>(null);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
   const selectedItemRef = useRef<HTMLDivElement>(null);
+  const touchStartY = useRef<number | null>(null);
+  const lastTapTime = useRef<number>(0);
 
   // Configuração do Fuse.js para fuzzy search
   const fuse = useMemo(() => {
@@ -97,6 +99,42 @@ export function SearchDialog({ isOpen, onClose, links }: SearchDialogProps) {
         onClose();
         break;
     }
+  };
+
+  // Touch navigation for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartY.current) return;
+    
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaY = touchStartY.current - touchEndY;
+    const minSwipeDistance = 30;
+    const currentTime = Date.now();
+
+    // Verifica se foi um tap (movimento mínimo)
+    if (Math.abs(deltaY) < minSwipeDistance) {
+      // Double tap para abrir link
+      if (currentTime - lastTapTime.current < 300) {
+        if (filteredLinks[selectedIndex]) {
+          handleLinkAction(filteredLinks[selectedIndex], 'open');
+        }
+      }
+      lastTapTime.current = currentTime;
+    } else {
+      // Swipe up (próximo item)
+      if (deltaY > minSwipeDistance) {
+        setSelectedIndex(prev => Math.min(prev + 1, filteredLinks.length - 1));
+      }
+      // Swipe down (item anterior)
+      else if (deltaY < -minSwipeDistance) {
+        setSelectedIndex(prev => Math.max(prev - 1, 0));
+      }
+    }
+
+    touchStartY.current = null;
   };
 
   const handleLinkAction = (link: LinkData, action: 'open' | 'copy' | 'qr' | 'analytics') => {
@@ -178,7 +216,12 @@ export function SearchDialog({ isOpen, onClose, links }: SearchDialogProps) {
                 </div>
 
                 {/* Results Area */}
-                <div className="px-6 pb-6 h-full overflow-y-auto" ref={resultsContainerRef}>
+                <div 
+                  className="px-6 pb-6 h-full overflow-y-auto" 
+                  ref={resultsContainerRef}
+                  onTouchStart={handleTouchStart}
+                  onTouchEnd={handleTouchEnd}
+                >
                   {filteredLinks.length === 0 ? (
                     <div className="text-center py-8">
                       <div className="w-12 h-12 bg-gray-100 rounded-2xl mx-auto mb-3 flex items-center justify-center">
@@ -298,15 +341,24 @@ export function SearchDialog({ isOpen, onClose, links }: SearchDialogProps) {
 
               </div>
 
-              {/* Keyboard Hint */}
+              {/* Navigation Hints */}
               <div className="mt-4 text-center">
-                <div className="flex items-center justify-center gap-2 text-white text-sm">
+                {/* Desktop hints */}
+                <div className="hidden md:flex items-center justify-center gap-2 text-white text-sm">
                   <kbd className="px-2 py-1 bg-white text-black rounded text-xs">↑↓</kbd>
                   <span>navegar</span>
                   <kbd className="px-2 py-1 bg-white text-black rounded text-xs">Enter</kbd>
                   <span>abrir</span>
                   <kbd className="px-2 py-1 bg-white text-black rounded text-xs">Esc</kbd>
                   <span>fechar</span>
+                </div>
+                
+                {/* Mobile hints */}
+                <div className="md:hidden flex items-center justify-center gap-2 text-white text-sm">
+                  <div className="px-2 py-1 bg-white text-black rounded text-xs">⬆️⬇️</div>
+                  <span>swipe para navegar</span>
+                  <div className="px-2 py-1 bg-white text-black rounded text-xs">👆👆</div>
+                  <span>duplo toque para abrir</span>
                 </div>
               </div>
 
