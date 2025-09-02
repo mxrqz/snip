@@ -43,10 +43,18 @@ export function Header() {
 
         <div className="flex items-center">
           {isSignedIn ? (
-            <UserButton />
+            <div className="flex gap-5">
+              <Link href={"/dashboard"} >
+                <Button className="bg-foreground text-background hover:text-background hover:bg-foreground">
+                  Dashboard
+                </Button>
+              </Link>
+
+              <UserButton />
+            </div>
           ) : (
             <Link href={"/login"}>
-              <Button className="bg-foreground text-background hover:text-foreground hover:bg-background">
+              <Button className="bg-foreground text-background hover:text-background hover:bg-foreground">
                 Entrar
               </Button>
             </Link>

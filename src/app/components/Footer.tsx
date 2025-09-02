@@ -25,8 +25,8 @@ export function Footer() {
           </div>
 
           {/* Right Column - Legal Links */}
-          <div className="flex flex-col md:flex-row w-full md:w-fit items-center gap-5 md:gap-10 h-fit text-sm">
-            <div className="w-full items-center flex flex-col gap-5">
+          <div className="flex flex-col md:flex-row w-full md:w-fit items-center text-nowrap gap-5 md:gap-10 h-fit text-sm">
+            <div className="w-full items-center md:items-start flex flex-col gap-5">
               <Link
                 href="/termos"
                 className="text-accent-foreground hover:text-foreground/30 h-fit"
@@ -42,7 +42,7 @@ export function Footer() {
               </Link>
             </div>
 
-            <div className="w-full items-center flex flex-col gap-5">
+            <div className="w-full items-center md:items-start flex flex-col gap-5">
               <Link
                 href="/cancelamento"
                 className="text-accent-foreground hover:text-foreground/30 h-fit"

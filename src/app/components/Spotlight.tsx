@@ -72,7 +72,7 @@ export default function Spotlight({isOpen}: {isOpen: boolean}) {
             <div className="w-full bg-foreground rounded-3xl shadow-2xl border overflow-hidden">
 
                 {/* Top Bar */}
-                <div className=" px-6 py-4 border-b border-gray-200">
+                <div className="px-6 py-4 border-b border-gray-200">
                     <div className="flex items-center gap-3">
                         <div className="flex gap-2">
                             <div className="w-3 h-3 bg-background rounded-full" />

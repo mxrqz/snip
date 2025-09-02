@@ -1,11 +1,18 @@
 import { useHotkeys } from 'react-hotkeys-hook';
 
-// Shortcut Ctrl/Cmd+K - Abrir spotlight/search
+// Shortcut Ctrl/Cmd+K - Abrir componente Spotlight (criar links)
 export const useSpotlightShortcut = ({onShortcut}: { onShortcut: () => void;}) => {
   useHotkeys('ctrl+k, cmd+k', (event) => {
     event.preventDefault();
-    // alert('Shortcut Ctrl/Cmd+K funcionando!');
     onShortcut()
+  });
+};
+
+// Shortcut Ctrl/Cmd+Shift+F - Buscar links existentes
+export const useSearchShortcut = (callback: () => void) => {
+  useHotkeys('ctrl+shift+f, cmd+shift+f', (event) => {
+    event.preventDefault();
+    callback();
   });
 };
 

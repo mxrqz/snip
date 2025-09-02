@@ -12,6 +12,10 @@ import { Link2, MousePointerClick, Calendar, Copy, ExternalLink, BarChart3, Plus
 import { copyToClipboard, formatDate } from "../utils/functions";
 import { fetchStats, fetchLinks, createLink } from '@/app/services/dashboardService';
 import { LinkData } from "../types/types";
+import { QRCodeDialog } from '@/app/components/dashboard/QRCodeDialog';
+import { QRCodeDialogWithLogo } from "../components/dashboard/QRCodeDialogWithLogo";
+import { SearchDialog } from '@/app/components/dashboard/SearchDialog';
+import { useSearchShortcut } from '@/app/hooks/useShortcuts';
 
 interface UserStats {
   totalLinks: number;
@@ -30,6 +34,9 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [newUrl, setNewUrl] = useState('');
   const [creating, setCreating] = useState(false);
+  const [qrDialogOpen, setQrDialogOpen] = useState(false);
+  const [selectedLink, setSelectedLink] = useState<LinkData | null>(null);
+  const [searchDialogOpen, setSearchDialogOpen] = useState(false);
 
   const handleFetchStats = async () => {
     const result = await fetchStats();
@@ -40,11 +47,11 @@ export default function Dashboard() {
 
   const handleFetchLinks = async (page: number) => {
     setLoading(true);
-    const result = await fetchLinks(page, 20);
+    const result = await fetchLinks(page, 10);
     if (result) {
       setLinks(result.links);
       setTotalCount(result.totalCount);
-      setTotalPages(Math.ceil(result.totalCount / 20));
+      setTotalPages(Math.ceil(result.totalCount / 10));
     }
     setLoading(false);
   };
@@ -63,6 +70,16 @@ export default function Dashboard() {
   const truncateUrl = (url: string, maxLength: number = 50) => {
     return url.length > maxLength ? `${url.substring(0, maxLength)}...` : url;
   };
+
+  const closeQRDialog = () => {
+    setQrDialogOpen(false);
+    setSelectedLink(null);
+  };
+
+  // Search shortcuts
+  useSearchShortcut(() => {
+    setSearchDialogOpen(true);
+  });
 
   useEffect(() => {
     if (isLoaded && userId) {
@@ -139,7 +156,7 @@ export default function Dashboard() {
                 onChange={(e) => setNewUrl(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleCreateLink()}
               />
-              
+
               <Button onClick={handleCreateLink} disabled={creating}>
                 {creating ? 'Criando...' : 'Encurtar'}
               </Button>
@@ -223,13 +240,39 @@ export default function Dashboard() {
                         </TableCell>
 
                         <TableCell className="text-center">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => window.open(link.analyticsUrl, '_blank')}
-                          >
-                            <BarChart3 className="h-3 w-3" />
-                          </Button>
+                          <div className="flex items-center justify-center gap-1">
+                            {/* <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openQRDialog(link)}
+                              title="Ver QR Code"
+                            >
+                              <QrCode className="h-3 w-3" />
+                            </Button> */}
+
+                            {/* <QRCodeDialog
+                              shortUrl={link.shortUrl}
+                              originalUrl={link.originalUrl}
+                              shortCode={link.shortCode}
+                              clicks={link.clicks || 0}
+                            /> */}
+
+                            <QRCodeDialogWithLogo
+                              shortUrl={link.shortUrl}
+                              originalUrl={link.originalUrl}
+                              shortCode={link.shortCode}
+                              clicks={link.clicks || 0}
+                            />
+
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => window.open(link.analyticsUrl, '_blank')}
+                              title="Ver Analytics"
+                            >
+                              <BarChart3 className="h-3 w-3" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -243,7 +286,12 @@ export default function Dashboard() {
                       <PaginationContent>
                         <PaginationItem>
                           <PaginationPrevious
-                            onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+                            onClick={() => {
+                              if (currentPage > 1) {
+                                setCurrentPage(currentPage - 1);
+                                handleFetchLinks(currentPage - 1);
+                              }
+                            }}
                             className={currentPage <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                           />
                         </PaginationItem>
@@ -268,7 +316,12 @@ export default function Dashboard() {
 
                         <PaginationItem>
                           <PaginationNext
-                            onClick={() => currentPage < totalPages && setCurrentPage(currentPage + 1)}
+                            onClick={() => {
+                              if (currentPage < totalPages) {
+                                setCurrentPage(currentPage + 1);
+                                handleFetchLinks(currentPage + 1);
+                              }
+                            }}
                             className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                           />
                         </PaginationItem>
@@ -281,6 +334,25 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* QR Code Dialog */}
+      {selectedLink && (
+        <QRCodeDialog
+          isOpen={qrDialogOpen}
+          onClose={closeQRDialog}
+          shortUrl={selectedLink.shortUrl}
+          originalUrl={selectedLink.originalUrl}
+          shortCode={selectedLink.shortCode}
+          clicks={selectedLink.clicks || 0}
+        />
+      )}
+
+      {/* Search Dialog */}
+      <SearchDialog
+        isOpen={searchDialogOpen}
+        onClose={() => setSearchDialogOpen(false)}
+        links={links}
+      />
     </div>
   );
 }

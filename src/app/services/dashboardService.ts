@@ -25,7 +25,7 @@ export const fetchStats = async (): Promise<UserStats | null> => {
   }
 };
 
-export const fetchLinks = async (page: number = 1, limit: number = 20): Promise<PaginatedLinks | null> => {
+export const fetchLinks = async (page: number = 1, limit: number = 10): Promise<PaginatedLinks | null> => {
   try {
     const response = await fetch(`/api/dashboard/links?page=${page}&limit=${limit}`);
     const data = await response.json();
