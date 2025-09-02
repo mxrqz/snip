@@ -15,14 +15,33 @@ import { LinkData } from "../types/types";
 import { QRCodeDialog } from '@/app/components/dashboard/QRCodeDialog';
 import { QRCodeDialogWithLogo } from "../components/dashboard/QRCodeDialogWithLogo";
 import { SearchDialog } from '@/app/components/dashboard/SearchDialog';
-import { useSearchShortcut } from '@/app/hooks/useShortcuts';
-import { FloatingDock } from "../components/FloatingDock";
+import { useSearchShortcut, useSpotlightShortcut } from '@/app/hooks/useShortcuts';
+import { FloatingDock, DockAction, DockItem } from "../components/FloatingDock";
+import SpotlightDialog from "../components/SpotlightDialog";
 
 interface UserStats {
   totalLinks: number;
   totalClicks: number;
   todayClicks: number;
 }
+
+const navItems: DockItem[] = [
+  {
+    title: "Home",
+    icon: <HomeIcon className="size-4" />,
+    action: 'home'
+  },
+  {
+    title: "Novo",
+    icon: <PlusIcon className="size-4" />,
+    action: 'create'
+  },
+  {
+    title: "Search",
+    icon: <SearchIcon className="size-4" />,
+    action: 'search'
+  },
+]
 
 export default function Dashboard() {
   const { isLoaded, userId } = useAuth();
@@ -38,6 +57,7 @@ export default function Dashboard() {
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
   const [selectedLink, setSelectedLink] = useState<LinkData | null>(null);
   const [searchDialogOpen, setSearchDialogOpen] = useState(false);
+  const [isSpotlightOpen, setIsSpotlightOpen] = useState(false)
 
   const handleFetchStats = async () => {
     const result = await fetchStats();
@@ -79,8 +99,27 @@ export default function Dashboard() {
 
   // Search shortcuts
   useSearchShortcut(() => {
-    setSearchDialogOpen(true);
+    setSearchDialogOpen(!searchDialogOpen);
   });
+
+  useSpotlightShortcut(() => {
+    setIsSpotlightOpen(!isSpotlightOpen)
+  })
+
+  const handleDockAction = (action: DockAction) => {
+    switch (action) {
+      case 'create':
+        setIsSpotlightOpen(!isSpotlightOpen)
+        break;
+
+      case "search":
+        setSearchDialogOpen(!searchDialogOpen);
+        break;
+
+      case "home":
+        break;
+    }
+  }
 
   useEffect(() => {
     if (isLoaded && userId) {
@@ -94,24 +133,6 @@ export default function Dashboard() {
       <div>Carregando...</div>
     </div>;
   }
-
-  const navItems = [
-    {
-      title: "Home",
-      icon: <HomeIcon className="size-4"/>,
-      href: '#'
-    },
-    {
-      title: "Novo",
-      icon: <PlusIcon className="size-4"/>,
-      href: '#'
-    },
-    {
-      title: "Search",
-      icon: <SearchIcon className="size-4"/>,
-      href: '#'
-    },
-  ]
 
   return (
     <div className="min-h-screen bg-background p-6 flex flex-col items-center w-full">
@@ -366,6 +387,13 @@ export default function Dashboard() {
         />
       )}
 
+      <FloatingDock
+        items={navItems}
+        onAction={handleDockAction}
+        desktopClassName="sticky bottom-10 z-[999]"
+        mobileClassName="fixed bottom-10 right-3 z-[999]"
+      />
+
       {/* Search Dialog */}
       <SearchDialog
         isOpen={searchDialogOpen}
@@ -373,7 +401,8 @@ export default function Dashboard() {
         links={links}
       />
 
-      <FloatingDock items={navItems} desktopClassName="sticky bottom-10" mobileClassName="fixed bottom-10 right-3" />
+      <SpotlightDialog isOpen={isSpotlightOpen} onClose={() => setIsSpotlightOpen(false)} />
+        
     </div>
   );
 }

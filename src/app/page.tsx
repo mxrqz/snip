@@ -17,8 +17,8 @@ import AdvancedFeatures from "./components/landing/AdvancedFeatures";
 export default function Home() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
-  useSpotlightShortcut({
-    onShortcut: () => setIsOpen(!isOpen)
+  useSpotlightShortcut(() => {
+    setIsOpen(!isOpen)
   });
 
   return (

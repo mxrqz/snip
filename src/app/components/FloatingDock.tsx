@@ -53,6 +53,7 @@
  * Mobile navbar is better positioned at bottom right.
  **/
 
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
 import {
@@ -66,28 +67,40 @@ import {
 
 import { useRef, useState } from "react";
 
+export type DockAction = 'home' | 'create' | 'search' | 'analytics' | 'recent' | 'settings';
+
+export interface DockItem {
+    title: string;
+    icon: React.ReactNode;
+    action: DockAction;
+}
+
 export const FloatingDock = ({
     items,
+    onAction,
     desktopClassName,
     mobileClassName,
 }: {
-    items: { title: string; icon: React.ReactNode; href: string }[];
+    items: DockItem[];
+    onAction: (action: DockAction) => void;
     desktopClassName?: string;
     mobileClassName?: string;
 }) => {
     return (
         <>
-            <FloatingDockDesktop items={items} className={desktopClassName} />
-            <FloatingDockMobile items={items} className={mobileClassName} />
+            <FloatingDockDesktop items={items} onAction={onAction} className={desktopClassName} />
+            <FloatingDockMobile items={items} onAction={onAction} className={mobileClassName} />
         </>
     );
 };
 
 const FloatingDockMobile = ({
     items,
+    onAction,
     className,
 }: {
-    items: { title: string; icon: React.ReactNode; href: string }[];
+    items: DockItem[];
+    onAction: (action: DockAction) => void;
     className?: string;
 }) => {
     const [open, setOpen] = useState(false);
@@ -96,12 +109,12 @@ const FloatingDockMobile = ({
         <div className={cn("relative block md:hidden", className)}>
             <AnimatePresence>
                 {open && (
-                    <motion.div
+                    <motion.ul
                         layoutId="nav"
                         className="absolute inset-x-0 bottom-full mb-2 flex flex-col gap-2 w-fit"
                     >
                         {items.map((item, idx) => (
-                            <motion.div
+                            <motion.li
                             className="w-fit"
                                 key={item.title}
                                 initial={{ opacity: 0, y: 10 }}
@@ -118,16 +131,16 @@ const FloatingDockMobile = ({
                                 }}
                                 transition={{ delay: (items.length - 1 - idx) * 0.05 }}
                             >
-                                <a
-                                    href={item.href}
+                                <div
+                                    onClick={() => onAction(item.action)}
                                     key={item.title}
                                     className="flex size-16 items-center justify-center rounded-full bg-gradient-to-b from-background to-neutral-950 border"
                                 >
                                     <div className="text-foreground">{item.icon}</div>
-                                </a>
-                            </motion.div>
+                                </div>
+                            </motion.li>
                         ))}
-                    </motion.div>
+                    </motion.ul>
                 )}
             </AnimatePresence>
 
@@ -143,15 +156,17 @@ const FloatingDockMobile = ({
 
 const FloatingDockDesktop = ({
     items,
+    onAction,
     className,
 }: {
-    items: { title: string; icon: React.ReactNode; href: string }[];
+    items: DockItem[];
+    onAction: (action: DockAction) => void;
     className?: string;
 }) => {
     const mouseX = useMotionValue(Infinity);
     
     return (
-        <motion.div
+        <motion.ul
             onMouseMove={(e) => mouseX.set(e.pageX)}
             onMouseLeave={() => mouseX.set(Infinity)}
             className={cn(
@@ -160,9 +175,9 @@ const FloatingDockDesktop = ({
             )}
         >
             {items.map((item) => (
-                <IconContainer mouseX={mouseX} key={item.title} {...item} />
+                <IconContainer mouseX={mouseX} key={item.title} onAction={onAction} {...item} />
             ))}
-        </motion.div>
+        </motion.ul>
     );
 };
 
@@ -170,12 +185,14 @@ function IconContainer({
     mouseX,
     title,
     icon,
-    href,
+    action,
+    onAction,
 }: {
     mouseX: MotionValue;
     title: string;
     icon: React.ReactNode;
-    href: string;
+    action: DockAction;
+    onAction: (action: DockAction) => void;
 }) {
     const ref = useRef<HTMLDivElement>(null);
 
@@ -222,13 +239,14 @@ function IconContainer({
     const [hovered, setHovered] = useState(false);
 
     return (
-        <a href={href}>
+        <li>
             <motion.div
                 ref={ref}
                 style={{ width, height }}
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
-                className="relative flex aspect-square items-center justify-center rounded-full bg-gradient-to-b from-background to-neutral-950 border"
+                onClick={() => onAction(action)}
+                className="relative flex aspect-square items-center justify-center rounded-full bg-gradient-to-b from-background to-neutral-950 border cursor-pointer"
             >
                 <AnimatePresence>
                     {hovered && (
@@ -250,6 +268,6 @@ function IconContainer({
                     {icon}
                 </motion.div>
             </motion.div>
-        </a>
+        </li>
     );
 }
