@@ -27,8 +27,6 @@ export function SearchDialog({ isOpen, onClose, links }: SearchDialogProps) {
   const [selectedLink, setSelectedLink] = useState<LinkData | null>(null);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
   const selectedItemRef = useRef<HTMLDivElement>(null);
-  const touchStartY = useRef<number | null>(null);
-  const lastTapTime = useRef<number>(0);
 
   // Configuração do Fuse.js para fuzzy search
   const fuse = useMemo(() => {
@@ -101,42 +99,6 @@ export function SearchDialog({ isOpen, onClose, links }: SearchDialogProps) {
     }
   };
 
-  // Touch navigation for mobile
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!touchStartY.current) return;
-    
-    const touchEndY = e.changedTouches[0].clientY;
-    const deltaY = touchStartY.current - touchEndY;
-    const minSwipeDistance = 30;
-    const currentTime = Date.now();
-
-    // Verifica se foi um tap (movimento mínimo)
-    if (Math.abs(deltaY) < minSwipeDistance) {
-      // Double tap para abrir link
-      if (currentTime - lastTapTime.current < 300) {
-        if (filteredLinks[selectedIndex]) {
-          handleLinkAction(filteredLinks[selectedIndex], 'open');
-        }
-      }
-      lastTapTime.current = currentTime;
-    } else {
-      // Swipe up (próximo item)
-      if (deltaY > minSwipeDistance) {
-        setSelectedIndex(prev => Math.min(prev + 1, filteredLinks.length - 1));
-      }
-      // Swipe down (item anterior)
-      else if (deltaY < -minSwipeDistance) {
-        setSelectedIndex(prev => Math.max(prev - 1, 0));
-      }
-    }
-
-    touchStartY.current = null;
-  };
-
   const handleLinkAction = (link: LinkData, action: 'open' | 'copy' | 'qr' | 'analytics') => {
     switch (action) {
       case 'open':
@@ -151,7 +113,7 @@ export function SearchDialog({ isOpen, onClose, links }: SearchDialogProps) {
         setShowQRDialog(true);
         break;
       case 'analytics':
-        window.open(link.analyticsUrl, '_blank');
+        window.open(`/analytics/${link.shortCode}`, '_blank');
         onClose();
         break;
     }
@@ -183,7 +145,7 @@ export function SearchDialog({ isOpen, onClose, links }: SearchDialogProps) {
             >
 
               {/* Main Search Container */}
-              <div className="bg-foreground rounded-3xl shadow-2xl overflow-hidden max-h-fit h-fit aspect-[16/10] flex flex-col">
+              <div className="bg-foreground rounded-3xl shadow-2xl overflow-hidden max-h-fit h-96 md:aspect-[16/10] flex flex-col">
 
                 {/* Top Bar */}
                 <div className="px-6 py-4 border-b border-gray-200">
@@ -193,6 +155,7 @@ export function SearchDialog({ isOpen, onClose, links }: SearchDialogProps) {
                       <div className="w-3 h-3 bg-background rounded-full"></div>
                       <div className="w-3 h-3 bg-background rounded-full"></div>
                     </div>
+
                     <div className="text-sm text-gray-600 font-medium">Buscar Links</div>
                   </div>
                 </div>
@@ -203,6 +166,7 @@ export function SearchDialog({ isOpen, onClose, links }: SearchDialogProps) {
                     <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
                       <Search className="w-5 h-5" />
                     </div>
+
                     <input
                       type="text"
                       placeholder="Buscar por URL ou código..."
@@ -216,17 +180,16 @@ export function SearchDialog({ isOpen, onClose, links }: SearchDialogProps) {
                 </div>
 
                 {/* Results Area */}
-                <div 
-                  className="px-6 pb-6 h-full overflow-y-auto" 
+                <div
+                  className="px-6 pb-6 h-full overflow-y-auto"
                   ref={resultsContainerRef}
-                  onTouchStart={handleTouchStart}
-                  onTouchEnd={handleTouchEnd}
                 >
                   {filteredLinks.length === 0 ? (
                     <div className="text-center py-8">
                       <div className="w-12 h-12 bg-gray-100 rounded-2xl mx-auto mb-3 flex items-center justify-center">
                         <Search className="w-6 h-6 text-gray-400" />
                       </div>
+
                       <div className="text-gray-500 text-sm">
                         {searchQuery ? 'Nenhum link encontrado' : 'Digite para buscar seus links'}
                       </div>
@@ -244,42 +207,49 @@ export function SearchDialog({ isOpen, onClose, links }: SearchDialogProps) {
                           onClick={() => handleLinkAction(link, 'open')}
                         >
                           {/* Link Info */}
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-3 min-w-0 flex-1">
-                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${index === selectedIndex ? 'bg-white' : 'bg-black'
-                                }`}>
-                                <ExternalLink className={`w-4 h-4 ${index === selectedIndex ? 'text-black' : 'text-white'
-                                  }`} />
-                              </div>
+                          <div>
 
-                              <div className="min-w-0 flex-1">
-                                <div className={`font-medium text-sm ${index === selectedIndex ? 'text-white' : 'text-black'
-                                  }`}>
-                                  {truncateUrl(link.originalUrl)}
-                                </div>
-
-                                <div className="flex items-center gap-2 mt-1">
-                                  <code className={`text-xs px-2 py-1 rounded ${index === selectedIndex
-                                    ? 'bg-foreground text-background'
-                                    : 'bg-background text-foreground'
-                                    }`}>
-                                    {link.shortCode}
-                                  </code>
-
-                                  <code className={`text-xs px-2 py-1 rounded ${index === selectedIndex
-                                    ? 'border border-foreground text-foreground'
-                                    : 'border border-background text-background'
-                                    }`}>
-                                    {link.clicks || 0} cliques
-                                  </code>
-                                </div>
-                              </div>
+                            <div className="flex md:hidden items-center gap-1 text-xs opacity-70">
+                              <Calendar className="md:hidden w-3 h-3" />
+                              <span>{formatDate(link.createdAt)}</span>
                             </div>
 
-                            {/* Date */}
-                            <div className="flex items-center gap-1 text-xs opacity-70">
-                              <Calendar className="w-3 h-3" />
-                              <span>{formatDate(link.createdAt)}</span>
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center gap-3 min-w-0 flex-1">
+
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${index === selectedIndex ? 'bg-white' : 'bg-black'}`}>
+                                  <ExternalLink className={`w-4 h-4 ${index === selectedIndex ? 'text-black' : 'text-white'
+                                    }`} />
+                                </div>
+
+                                <div className="min-w-0 flex-1">
+                                  <div className={`font-medium text-sm ${index === selectedIndex ? 'text-white' : 'text-black'}`}>
+                                    {truncateUrl(link.originalUrl)}
+                                  </div>
+
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <code className={`text-xs px-2 py-1 rounded ${index === selectedIndex
+                                      ? 'bg-foreground text-background'
+                                      : 'bg-background text-foreground'
+                                      }`}>
+                                      {link.shortCode}
+                                    </code>
+
+                                    <code className={`text-xs px-2 py-1 rounded ${index === selectedIndex
+                                      ? 'border border-foreground text-foreground'
+                                      : 'border border-background text-background'
+                                      }`}>
+                                      {link.clicks || 0} cliques
+                                    </code>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Date */}
+                              <div className="hidden md:flex items-center gap-1 text-xs opacity-70">
+                                <Calendar className="w-3 h-3" />
+                                <span>{formatDate(link.createdAt)}</span>
+                              </div>
                             </div>
                           </div>
 
@@ -351,14 +321,6 @@ export function SearchDialog({ isOpen, onClose, links }: SearchDialogProps) {
                   <span>abrir</span>
                   <kbd className="px-2 py-1 bg-white text-black rounded text-xs">Esc</kbd>
                   <span>fechar</span>
-                </div>
-                
-                {/* Mobile hints */}
-                <div className="md:hidden flex items-center justify-center gap-2 text-white text-sm">
-                  <div className="px-2 py-1 bg-white text-black rounded text-xs">⬆️⬇️</div>
-                  <span>swipe para navegar</span>
-                  <div className="px-2 py-1 bg-white text-black rounded text-xs">👆👆</div>
-                  <span>duplo toque para abrir</span>
                 </div>
               </div>
 
