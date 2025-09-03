@@ -1,4 +1,4 @@
-import { Command, ExternalLinkIcon, Link2 } from 'lucide-react';
+import { ArrowRight, Command, ExternalLinkIcon, Link2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { copyToClipboard } from "@/app/utils/functions";
 import { createLink } from "@/app/services/dashboardService";
@@ -85,22 +85,27 @@ export default function Spotlight({isOpen}: {isOpen: boolean}) {
                 </div>
 
                 {/* Search Area */}
-                <div className="p-6">
-                    <form onSubmit={handleSubmit}>
-                        <div className="relative">
+                <div className="p-6 flex gap-5 w-full">
+                    <form onSubmit={handleSubmit} className="w-full">
+                        <div className="relative w-full h-14 flex items-center">
                             <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
                                 <Command className="w-5 h-5" />
                             </div>
+
                             <input
                                 type="text"
                                 placeholder="Cole sua URL aqui..."
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
-                                className="w-full pl-12 pr-4 py-4 bg-gray-50 rounded-2xl border-none outline-none text-black placeholder-gray-400 text-lg"
+                                className="w-full pl-12 pr-4 h-full bg-gray-50 rounded-2xl border-none outline-none text-black placeholder-gray-400 text-lg"
                                 autoFocus
                             />
                         </div>
                     </form>
+
+                    <Button className="h-14 aspect-video bg-background text-foreground">
+                        <ArrowRight />
+                    </Button>
                 </div>
 
                 {/* Results Area */}
@@ -122,7 +127,7 @@ export default function Spotlight({isOpen}: {isOpen: boolean}) {
                     {/* Result */}
                     {showResult && shortUrlData && shortUrlData.data && (
                         <div className="flex flex-col gap-3 w-full">
-                            <Link href={shortUrlData.data?.analyticsUrl} target="_blank">
+                            <Link href={`/analytics/${shortUrlData.data?.shortCode}`} target="_blank">
                                 <div className="flex items-center justify-between gap-3 p-4 bg-black rounded-2xl cursor-pointer hover:bg-gray-800 transition-colors">
                                     <div className="flex gap-4 items-center">
                                         <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
