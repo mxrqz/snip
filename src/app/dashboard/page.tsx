@@ -307,7 +307,7 @@ export default function Dashboard() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => window.open(link.analyticsUrl, '_blank')}
+                              onClick={() => window.open(`/analytics/${link.shortCode}`, '_blank')}
                               title="Ver Analytics"
                             >
                               <BarChart3 className="h-3 w-3" />
@@ -402,7 +402,6 @@ export default function Dashboard() {
       />
 
       <SpotlightDialog isOpen={isSpotlightOpen} onClose={() => setIsSpotlightOpen(false)} />
-        
     </div>
   );
 }
