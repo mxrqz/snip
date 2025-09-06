@@ -36,7 +36,7 @@ export default function RootLayout({
       <html lang="pt-BR" suppressHydrationWarning>
         <head>
           <link rel="manifest" href="/manifest.json" />
-          <link rel="icon" type="image/png" sizes="196x196" href="/favicon-196.png" />
+          <link rel="icon" type="image/svg+xml" href="/S_white.svg" />
           <link rel="apple-touch-icon" href="/apple-icon-180.png" />
           {/* <meta name="apple-mobile-web-app-capable" content="yes" /> */}
           <meta name="mobile-web-app-capable" content="yes" />

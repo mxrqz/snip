@@ -5,7 +5,7 @@ import { getAuth } from "firebase-admin/auth";
 import type { ServiceAccount } from "firebase-admin/app";
 
 const serviceAccount = JSON.parse(
-  process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}'
+  (process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}')
 );
 
 const firebaseAdminConfig = {
