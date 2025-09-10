@@ -59,11 +59,11 @@ export async function POST(request: NextRequest) {
     await db.collection('newsletter').add(subscriberData);
 
     // Also add to Resend (if API key is configured)
-    if (process.env.RESEND_API_KEY) {
+    if (process.env.RESEND_API_KEY && process.env.RESEND_AUDIENCE_ID) {
       try {
         await resend.contacts.create({
           email: normalizedEmail,
-          audienceId: process.env.RESEND_AUDIENCE_ID, // You'll need to set this
+          audienceId: process.env.RESEND_AUDIENCE_ID,
         });
       } catch (resendError) {
         // Log the error but don't fail the request

@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid';
 import { savePublicLinkData, shortCodeExists } from '@/app/utils/database';
 import { isValidUrl } from '@/app/utils/functions';
 import { PublicLinkData, CreatePublicLinkResponse } from '@/app/types/types';
+import { FieldValue } from 'firebase-admin/firestore';
 
 export async function POST(request: NextRequest) {
   try {
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
       shortCode,
       originalUrl: url,
       shortUrl: `${baseUrl}/${shortCode}`,
-      createdAt: new Date(),
+      createdAt: FieldValue.serverTimestamp(),
       clicks: 0
     };
 

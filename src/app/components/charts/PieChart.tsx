@@ -61,7 +61,6 @@ export default function PieChart({
             {data.map((item, index) => {
               const percentage = (item.value / total) * 100;
               const path = createPath(percentage, currentAngle);
-              const angle = currentAngle;
               currentAngle += (percentage / 100) * 360;
               
               return (

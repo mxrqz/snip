@@ -5,10 +5,7 @@ import {
   ProfessionalAnalytics, 
   AnalyticsTotals, 
   AnalyticsCharts, 
-  AnalyticsBreakdowns,
-  PeakHourData,
-  TopLocationData,
-  DeviceBreakdownData
+  AnalyticsBreakdowns
 } from '@/app/types/types';
 
 /**
@@ -75,7 +72,8 @@ function updateChartsArrays(
   clickEvent: ClickEvent
 ): AnalyticsCharts {
   // Atualizar peak hours
-  const hour = new Date(clickEvent.timestamp as any).getHours();
+  const timestamp = clickEvent.timestamp as Timestamp;
+  const hour = timestamp.toDate().getHours();
   const hourString = `${hour.toString().padStart(2, '0')}:00`;
   const hourLabel = `${hour}h`;
 
@@ -271,7 +269,7 @@ export async function updateAnalyticsSummary(
       totals: updatedTotals,
       charts: updatedCharts,
       breakdowns: updatedBreakdowns,
-      lastClickAt: FieldValue.serverTimestamp() as any
+      lastClickAt: FieldValue.serverTimestamp() as Timestamp
     };
 
     await summaryRef.set(updatedAnalytics);

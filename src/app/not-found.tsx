@@ -1,16 +1,9 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Home, ArrowLeft } from 'lucide-react';
-import { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: '404 - Página não encontrada',
-  description: 'A página que você está procurando não foi encontrada. Volte para a página inicial do Snip.',
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
 
 export default function NotFound() {
   return (
@@ -33,11 +26,9 @@ export default function NotFound() {
               Voltar ao início
             </Link>
           </Button>
-          <Button asChild variant="outline" onClick={() => window.history.back()}>
-            <Link href="#" onClick={(e) => { e.preventDefault(); window.history.back(); }}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar
-            </Link>
+          <Button variant="outline" onClick={() => window.history.back()}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar
           </Button>
         </div>
 

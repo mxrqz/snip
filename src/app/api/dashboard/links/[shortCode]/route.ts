@@ -36,9 +36,9 @@ export async function GET(request: NextRequest, { params }: Props) {
         .collection('links')
         .doc(shortCode)
         .get();
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Verificar se é erro de permissão do Firestore
-      if (error.code === 'permission-denied') {
+      if (error && typeof error === 'object' && 'code' in error && (error as { code: string }).code === 'permission-denied') {
         return NextResponse.json(
           { error: 'Acesso negado - Você não tem permissão para visualizar este link' },
           { status: 403 }

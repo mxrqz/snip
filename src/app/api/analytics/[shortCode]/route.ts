@@ -3,7 +3,7 @@ import { validateAuth } from '@/app/utils/auth';
 import { getAnalyticsSummary } from '@/app/utils/database';
 import { getProfessionalAnalytics } from '@/app/utils/analyticsAggregator';
 import { db } from '@/app/utils/firebase/admin';
-import { LinkAnalytics, ProfessionalAnalytics } from '@/app/types/types';
+import { LinkAnalytics } from '@/app/types/types';
 
 interface Props {
   params: Promise<{
@@ -39,9 +39,9 @@ export async function GET(request: NextRequest, { params }: Props) {
         .collection('links')
         .doc(shortCode)
         .get();
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Verificar se é erro de permissão do Firestore
-      if (error.code === 'permission-denied') {
+      if (error && typeof error === 'object' && 'code' in error && (error as { code: string }).code === 'permission-denied') {
         return NextResponse.json(
           { error: 'Acesso negado - Você não tem permissão para visualizar este link' },
           { status: 403 }
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest, { params }: Props) {
     const linkData = linkDoc.data();
 
     // Tentar buscar analytics profissionais primeiro
-    let professionalAnalytics = await getProfessionalAnalytics(authResult.userId!, shortCode);
+    const professionalAnalytics = await getProfessionalAnalytics(authResult.userId!, shortCode);
     
     // Se não existir, criar um fallback usando o método antigo
     if (!professionalAnalytics) {
@@ -77,26 +77,26 @@ export async function GET(request: NextRequest, { params }: Props) {
       // Converter para formato legado
       const realAnalytics: LinkAnalytics = {
         shortCode,
-        totalClicks: fallbackData.totalClicks,
-        uniqueClicks: fallbackData.uniqueClicks,
+        totalClicks: (fallbackData.totalClicks as number) || 0,
+        uniqueClicks: (fallbackData.uniqueClicks as number) || 0,
         lastClickAt: linkData?.lastClickAt?.toDate ? linkData.lastClickAt.toDate().toISOString() : linkData?.lastClickAt || null,
         createdAt: linkData?.createdAt?.toDate ? linkData.createdAt.toDate().toISOString() : linkData?.createdAt || null,
         
-        countries: fallbackData.countries,
-        regions: fallbackData.regions,
-        cities: fallbackData.cities,
-        devices: fallbackData.devices,
-        browsers: fallbackData.browsers,
-        operatingSystems: fallbackData.operatingSystems,
-        referrers: fallbackData.referrers,
-        utmSources: fallbackData.utmSources,
-        utmMediums: fallbackData.utmMediums,
-        utmCampaigns: fallbackData.utmCampaigns,
+        countries: (fallbackData.countries as Record<string, number>) || {},
+        regions: (fallbackData.regions as Record<string, number>) || {},
+        cities: (fallbackData.cities as Record<string, number>) || {},
+        devices: (fallbackData.devices as Record<string, number>) || {},
+        browsers: (fallbackData.browsers as Record<string, number>) || {},
+        operatingSystems: (fallbackData.operatingSystems as Record<string, number>) || {},
+        referrers: (fallbackData.referrers as Record<string, number>) || {},
+        utmSources: (fallbackData.utmSources as Record<string, number>) || {},
+        utmMediums: (fallbackData.utmMediums as Record<string, number>) || {},
+        utmCampaigns: (fallbackData.utmCampaigns as Record<string, number>) || {},
         
-        clicksByHour: fallbackData.clicksByHour,
-        clicksByDay: fallbackData.clicksByDay,
-        clicksByDate: fallbackData.clicksByDate,
-        clicksByMonth: fallbackData.clicksByMonth
+        clicksByHour: (fallbackData.clicksByHour as Record<string, number>) || {},
+        clicksByDay: (fallbackData.clicksByDay as Record<string, number>) || {},
+        clicksByDate: (fallbackData.clicksByDate as Record<string, number>) || {},
+        clicksByMonth: (fallbackData.clicksByMonth as Record<string, number>) || {}
       };
 
       return NextResponse.json({
@@ -110,8 +110,8 @@ export async function GET(request: NextRequest, { params }: Props) {
       shortCode,
       totalClicks: professionalAnalytics.totals.clicks,
       uniqueClicks: professionalAnalytics.totals.uniqueClicks,
-      lastClickAt: professionalAnalytics.lastClickAt?.toDate ? professionalAnalytics.lastClickAt.toDate().toISOString() : professionalAnalytics.lastClickAt || null,
-      createdAt: professionalAnalytics.createdAt?.toDate ? professionalAnalytics.createdAt.toDate().toISOString() : professionalAnalytics.createdAt,
+      lastClickAt: professionalAnalytics.lastClickAt?.toDate ? professionalAnalytics.lastClickAt.toDate().toISOString() : null,
+      createdAt: professionalAnalytics.createdAt?.toDate ? professionalAnalytics.createdAt.toDate().toISOString() : null,
       
       countries: professionalAnalytics.breakdowns.countries,
       regions: professionalAnalytics.breakdowns.regions,

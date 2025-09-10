@@ -198,7 +198,7 @@ export function sanitizeAnalyticsData<T extends Record<string, unknown>>(data: T
   // Sanitize string fields
   Object.keys(sanitized).forEach(key => {
     if (typeof sanitized[key] === 'string') {
-      sanitized[key] = sanitized[key].trim();
+      (sanitized as Record<string, unknown>)[key] = (sanitized[key] as string).trim();
     }
   });
   

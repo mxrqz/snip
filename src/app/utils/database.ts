@@ -9,7 +9,7 @@ export interface LinkInfo {
   hasPassword: boolean;
   isExpired: boolean;
   password?: string;
-  expiresAt?: any;
+  expiresAt?: Timestamp;
 }
 
 export async function getOriginalUrl(shortCode: string): Promise<string | null> {
@@ -86,7 +86,7 @@ export async function getLinkInfo(shortCode: string): Promise<LinkInfo | null> {
           hasPassword: !!linkData.password,
           isExpired,
           password: linkData.password || undefined,
-          expiresAt: linkData.expiresAt
+          expiresAt: linkData.expiresAt ? linkData.expiresAt as Timestamp : undefined
         };
       }
     }

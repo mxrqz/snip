@@ -167,8 +167,8 @@ export interface LinkAnalytics {
   shortCode: string;
   totalClicks: number;
   uniqueClicks: number;
-  lastClickAt?: Timestamp;
-  createdAt: Timestamp;
+  lastClickAt?: string | null;
+  createdAt: string | null;
   
   // Geographic breakdown
   countries: Record<string, number>;

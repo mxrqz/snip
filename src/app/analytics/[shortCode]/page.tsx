@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,7 +18,7 @@ import {
   Copy
 } from 'lucide-react';
 import { LinkAnalytics, LinkData } from '@/app/types/types';
-import { copyToClipboard, formatDate, formatDateTime } from '@/app/utils/functions';
+import { copyToClipboard, formatDate } from '@/app/utils/functions';
 import BarChart from '@/app/components/charts/BarChart';
 import LineChart from '@/app/components/charts/LineChart';
 import PieChart from '@/app/components/charts/PieChart';
@@ -34,14 +34,7 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isLoaded && userId && shortCode) {
-      fetchAnalytics();
-      fetchLinkData();
-    }
-  }, [isLoaded, userId, shortCode]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       const response = await fetch(`/api/analytics/${shortCode}`);
       
@@ -71,9 +64,9 @@ export default function AnalyticsPage() {
     } catch (err) {
       setError(`v ${err}`);
     }
-  };
+  }, [shortCode]);
 
-  const fetchLinkData = async () => {
+  const fetchLinkData = useCallback(async () => {
     try {
       const response = await fetch(`/api/dashboard/links/${shortCode}`);
       
@@ -109,7 +102,14 @@ export default function AnalyticsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [shortCode]);
+
+  useEffect(() => {
+    if (isLoaded && userId && shortCode) {
+      fetchAnalytics();
+      fetchLinkData();
+    }
+  }, [isLoaded, userId, shortCode, fetchAnalytics, fetchLinkData]);
 
   const getTopItems = (data: Record<string, number>, limit: number = 5) => {
     return Object.entries(data)
@@ -494,8 +494,8 @@ export default function AnalyticsPage() {
               <div className="text-sm text-muted-foreground">
                 Último clique registrado em: {' '}
                 <span className="font-medium text-foreground">
-                  {analytics.lastClickAt && typeof analytics.lastClickAt === 'object' && 'seconds' in analytics.lastClickAt 
-                    ? new Date(analytics.lastClickAt.seconds * 1000).toLocaleString('pt-BR')
+                  {analytics.lastClickAt 
+                    ? new Date(analytics.lastClickAt).toLocaleString('pt-BR')
                     : 'Data não disponível'}
                 </span>
               </div>
