@@ -11,23 +11,44 @@ import { SnipLogoS } from "../snip-logos";
 
 export function CTASection() {
   const [email, setEmail] = useState('');
-  // const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [isSubscribing, setIsSubscribing] = useState(false);
 
-  const handleGetStarted = () => {
-    if (email.trim()) {
-      toast.success('Redirecionando para o cadastro!');
-      // In a real app, you might save the email and redirect to signup with pre-filled email
+  const handleNewsletterSignup = async () => {
+    if (!email.trim()) {
+      toast.error('Digite um email válido');
+      return;
+    }
+
+    setIsSubscribing(true);
+
+    try {
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          source: 'landing-page'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(data.message || 'Email cadastrado com sucesso!');
+        setEmail('');
+      } else {
+        toast.error(data.error || 'Erro ao cadastrar email');
+      }
+    } catch (error) {
+      console.error('Newsletter subscription error:', error);
+      toast.error('Erro ao cadastrar email. Tente novamente.');
+    } finally {
+      setIsSubscribing(false);
     }
   };
 
-  // const handleNewsletterSignup = () => {
-  //   if (newsletterEmail.trim()) {
-  //     toast.success('Email cadastrado! Você receberá novidades do Momentum.');
-  //     setNewsletterEmail('');
-  //   } else {
-  //     toast.error('Digite um email válido');
-  //   }
-  // };
 
   return (
     <section className="flex flex-col text-center gap-10 w-full py-12 px-5 bg-foreground rounded-2xl" id="newsletter">
@@ -53,14 +74,20 @@ export function CTASection() {
             placeholder="Seu melhor email..."
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleNewsletterSignup();
+              }
+            }}
             className="w-full md:w-1/2 text-foreground bg-background border-none focus-visible:ring-0 placeholder:text-foreground"
           />
 
           <Button
-            onClick={handleGetStarted}
-            className="bg-black hover:bg-gray-800 text-white px-6 items-center"
+            onClick={handleNewsletterSignup}
+            disabled={isSubscribing}
+            className="bg-black hover:bg-gray-800 text-white px-6 items-center disabled:opacity-50"
           >
-            Assinar
+            {isSubscribing ? 'Cadastrando...' : 'Assinar'}
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>

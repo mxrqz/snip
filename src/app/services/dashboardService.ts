@@ -1,6 +1,6 @@
 import { toast } from 'sonner';
 import { PaginatedLinks } from '@/app/utils/database';
-import { CreateLinkResponse } from "../types/types";
+import { CreateLinkResponse, CreatePublicLinkResponse, LinkProtection } from "../types/types";
 
 interface UserStats {
   totalLinks: number;
@@ -83,7 +83,7 @@ const validateAndNormalizeUrl = (url: string): string | null => {
 };
 
 
-export const createLink = async (url: string): Promise<CreateLinkResponse> => {
+export const createLink = async (url: string, isLogged: boolean = false, protection?: LinkProtection): Promise<CreateLinkResponse> => {
   const validUrl = validateAndNormalizeUrl(url);
   
   if (!validUrl) {
@@ -92,11 +92,40 @@ export const createLink = async (url: string): Promise<CreateLinkResponse> => {
   }
 
   try {
-    const response = await fetch(`/api/encurtar?url=${encodeURIComponent(validUrl)}`);
+    let response: Response;
+    
+    if (isLogged) {
+      // Usuário logado: usar endpoint privado (com analytics)
+      response = await fetch('/api/encurtar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          url: validUrl,
+          expiresAt: protection?.expiresAt?.toISOString(),
+          password: protection?.password
+        }),
+      });
+    } else {
+      // Usuário não logado: usar endpoint público (sem analytics)
+      response = await fetch('/api/public/encurtar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: validUrl }),
+      });
+    }
+
     const data = await response.json();
 
     if (data.success) {
-      toast.success('Link criado com sucesso!');
+      const successMessage = isLogged 
+        ? 'Link criado com sucesso!' 
+        : 'Link público criado com sucesso!';
+      toast.success(successMessage);
+      
       return { success: true, data: data.data };
     } else {
       toast.error(data.error || 'Erro ao criar link');

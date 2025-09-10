@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '@/components/ui/table';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
-import { Link2, MousePointerClick, Calendar, Copy, ExternalLink, BarChart3, Plus, HomeIcon, PlusIcon, SearchIcon } from 'lucide-react';
+import { Link2, MousePointerClick, Calendar, Copy, ExternalLink, BarChart3, Plus, HomeIcon, PlusIcon, SearchIcon, Settings, Lock, Clock, Eye, EyeOff } from 'lucide-react';
 import { copyToClipboard, formatDate } from "../utils/functions";
 import { fetchStats, fetchLinks, createLink } from '@/app/services/dashboardService';
 import { LinkData } from "../types/types";
@@ -54,10 +54,14 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [newUrl, setNewUrl] = useState('');
   const [creating, setCreating] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [expiresAt, setExpiresAt] = useState('');
+  const [password, setPassword] = useState('');
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
   const [selectedLink, setSelectedLink] = useState<LinkData | null>(null);
   const [searchDialogOpen, setSearchDialogOpen] = useState(false);
-  const [isSpotlightOpen, setIsSpotlightOpen] = useState(false)
+  const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
+  const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set());
 
   const handleFetchStats = async () => {
     const result = await fetchStats();
@@ -79,9 +83,15 @@ export default function Dashboard() {
 
   const handleCreateLink = async () => {
     setCreating(true);
-    const result = await createLink(newUrl);
+    const result = await createLink(newUrl, true, { 
+      expiresAt: expiresAt ? new Date(expiresAt) : undefined,
+      password: password || undefined
+    });
     if (result.success) {
       setNewUrl('');
+      setExpiresAt('');
+      setPassword('');
+      setShowAdvanced(false);
       await handleFetchStats();
       await handleFetchLinks(currentPage);
     }
@@ -90,6 +100,16 @@ export default function Dashboard() {
 
   const truncateUrl = (url: string, maxLength: number = 50) => {
     return url.length > maxLength ? `${url.substring(0, maxLength)}...` : url;
+  };
+
+  const togglePasswordVisibility = (shortCode: string) => {
+    const newVisible = new Set(visiblePasswords);
+    if (newVisible.has(shortCode)) {
+      newVisible.delete(shortCode);
+    } else {
+      newVisible.add(shortCode);
+    }
+    setVisiblePasswords(newVisible);
   };
 
   const closeQRDialog = () => {
@@ -189,17 +209,64 @@ export default function Dashboard() {
           </CardHeader>
 
           <CardContent>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Digite a URL que deseja encurtar..."
-                value={newUrl}
-                onChange={(e) => setNewUrl(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleCreateLink()}
-              />
-
-              <Button onClick={handleCreateLink} disabled={creating}>
-                {creating ? 'Criando...' : 'Encurtar'}
-              </Button>
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Digite a URL que deseja encurtar..."
+                  value={newUrl}
+                  onChange={(e) => setNewUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleCreateLink()}
+                />
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  title="Opções avançadas"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+                <Button onClick={handleCreateLink} disabled={creating}>
+                  {creating ? 'Criando...' : 'Encurtar'}
+                </Button>
+              </div>
+              
+              {showAdvanced && (
+                <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
+                  <h4 className="text-sm font-medium">Opções Avançadas</h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <label className="text-sm text-muted-foreground flex items-center gap-2">
+                        <Clock className="h-3 w-3" />
+                        Data de Expiração
+                      </label>
+                      <Input
+                        type="datetime-local"
+                        value={expiresAt}
+                        onChange={(e) => setExpiresAt(e.target.value)}
+                        min={new Date().toISOString().slice(0, 16)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm text-muted-foreground flex items-center gap-2">
+                        <Lock className="h-3 w-3" />
+                        Senha de Acesso
+                      </label>
+                      <Input
+                        type="password"
+                        placeholder="Opcional"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  
+                  <p className="text-xs text-muted-foreground">
+                    Links com expiração ou senha ficam protegidos e só podem ser acessados mediante autenticação.
+                  </p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -225,6 +292,8 @@ export default function Dashboard() {
                       <TableHead>URL Original</TableHead>
                       <TableHead>URL Curta</TableHead>
                       <TableHead className="text-center">Cliques</TableHead>
+                      <TableHead className="text-center">Proteção</TableHead>
+                      <TableHead className="text-center">Expira</TableHead>
                       <TableHead className="text-center">Data</TableHead>
                       <TableHead className="text-center">Ações</TableHead>
                     </TableRow>
@@ -267,6 +336,48 @@ export default function Dashboard() {
 
                         <TableCell className="text-center">
                           <Badge className="bg-foreground text-background">{link.clicks || 0}</Badge>
+                        </TableCell>
+
+                        <TableCell className="text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            {link.password && (
+                              <div className="flex items-center gap-2">
+                                <Badge variant="secondary" className="text-xs">
+                                  <Lock className="h-3 w-3 mr-1" />
+                                  {visiblePasswords.has(link.shortCode) ? link.password : '••••••'}
+                                </Badge>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => togglePasswordVisibility(link.shortCode)}
+                                  className="h-6 w-6 p-0"
+                                  title={visiblePasswords.has(link.shortCode) ? 'Ocultar senha' : 'Mostrar senha'}
+                                >
+                                  {visiblePasswords.has(link.shortCode) ? (
+                                    <EyeOff className="h-3 w-3" />
+                                  ) : (
+                                    <Eye className="h-3 w-3" />
+                                  )}
+                                </Button>
+                              </div>
+                            )}
+                            {!link.password && (
+                              <span className="text-xs text-muted-foreground">-</span>
+                            )}
+                          </div>
+                        </TableCell>
+
+                        <TableCell className="text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            {link.expiresAt ? (
+                              <Badge variant="outline" className="text-xs">
+                                <Clock className="h-3 w-3 mr-1" />
+                                {formatDate(link.expiresAt)}
+                              </Badge>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">-</span>
+                            )}
+                          </div>
                         </TableCell>
 
                         <TableCell className="text-center">

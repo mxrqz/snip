@@ -1,0 +1,31 @@
+# robots.txt para Snip - Encurtador de Links
+
+User-agent: *
+Allow: /
+
+# Páginas importantes para SEO
+Allow: /
+Allow: /dashboard
+Allow: /analytics/*
+
+# Bloquear páginas privadas e administrativas
+Disallow: /api/
+Disallow: /protected/
+Disallow: /_next/
+Disallow: /admin/
+
+# Permitir crawling de assets
+Allow: /favicon.ico
+Allow: /robots.txt
+Allow: /sitemap.xml
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.svg
+
+# Sitemap
+Sitemap: https://snip.vercel.app/sitemap.xml
+
+# Crawl delay para ser gentil com os servidores
+Crawl-delay: 1

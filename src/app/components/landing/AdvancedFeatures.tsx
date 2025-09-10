@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { FileUp, Tag, Lock, MapPin, BellRing } from 'lucide-react';
+import Link from "next/link";
 
 export default function AdvancedFeatures() {
     const features = [
@@ -21,13 +22,13 @@ export default function AdvancedFeatures() {
             icon: Lock,
             title: 'Links Privados',
             description: 'Proteja seus links com senhas para acesso restrito',
-            badge: 'Em Breve'
+            badge: 'Ativo'
         },
         {
             icon: MapPin,
             title: 'Geolocalização',
             description: 'Analytics detalhados de países e cidades dos cliques',
-            badge: 'Em Breve'
+            badge: 'Ativo'
         }
     ];
 
@@ -85,10 +86,12 @@ export default function AdvancedFeatures() {
             </div>
 
             {/* Bottom CTA */}
+            <Link href={"#newsletter"}>
             <Button className="w-fit bg-foreground text-background hover:bg-foreground">
                 <span>Seja notificado quando lançarmos</span>
                 <BellRing />
             </Button>
+            </Link>
         </section>
     );
 }

@@ -5,11 +5,13 @@ import { createLink } from "@/app/services/dashboardService";
 import { CreateLinkResponse } from "@/app/types/types";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@clerk/nextjs";
 
-export default function Spotlight({isOpen}: {isOpen: boolean}) {
+export default function Spotlight({ isOpen }: { isOpen: boolean }) {
+    const { isSignedIn } = useUser();
     const [input, setInput] = useState('');
     const [shortUrl, setShortUrl] = useState('');
-    const [shortUrlData, setShortUrlData] = useState<CreateLinkResponse>()
+    const [shortUrlData, setShortUrlData] = useState<CreateLinkResponse>();
     const [isSearching, setIsSearching] = useState(false);
     const [showResult, setShowResult] = useState(false);
     const [os, setOs] = useState<'mac' | 'windows' | 'linux' | 'mobile' | 'unknown'>('unknown');
@@ -17,15 +19,15 @@ export default function Spotlight({isOpen}: {isOpen: boolean}) {
     useEffect(() => {
         const detectOS = () => {
             if (typeof navigator === 'undefined') return 'unknown';
-            
+
             const userAgent = navigator.userAgent.toLowerCase();
             const platform = navigator.platform?.toLowerCase() || '';
-            
+
             // Detecta mobile primeiro
             if (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent)) {
                 return 'mobile';
             }
-            
+
             // Detecta desktop OS
             if (platform.includes('mac') || userAgent.includes('mac')) {
                 return 'mac';
@@ -34,7 +36,7 @@ export default function Spotlight({isOpen}: {isOpen: boolean}) {
             } else if (platform.includes('linux') || userAgent.includes('linux')) {
                 return 'linux';
             }
-            
+
             return 'unknown';
         };
 
@@ -48,7 +50,7 @@ export default function Spotlight({isOpen}: {isOpen: boolean}) {
         setIsSearching(true);
         setShowResult(false);
 
-        const link = await createLink(input)
+        const link = await createLink(input, isSignedIn)
 
         if (link.success && link.data) {
             setShortUrl(link.data?.shortUrl);
@@ -86,7 +88,7 @@ export default function Spotlight({isOpen}: {isOpen: boolean}) {
 
                 {/* Search Area */}
                 <div className="p-6 flex gap-5 w-full">
-                    <form onSubmit={handleSubmit} className="w-full">
+                    <form onSubmit={handleSubmit} className="w-full flex gap-5">
                         <div className="relative w-full h-14 flex items-center">
                             <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
                                 <Command className="w-5 h-5" />
@@ -101,11 +103,12 @@ export default function Spotlight({isOpen}: {isOpen: boolean}) {
                                 autoFocus
                             />
                         </div>
+
+                        <Button type="submit" className="h-14 aspect-video bg-background text-foreground">
+                            <ArrowRight />
+                        </Button>
                     </form>
 
-                    <Button className="h-14 aspect-video bg-background text-foreground">
-                        <ArrowRight />
-                    </Button>
                 </div>
 
                 {/* Results Area */}
@@ -127,22 +130,37 @@ export default function Spotlight({isOpen}: {isOpen: boolean}) {
                     {/* Result */}
                     {showResult && shortUrlData && shortUrlData.data && (
                         <div className="flex flex-col gap-3 w-full">
-                            <Link href={`/analytics/${shortUrlData.data?.shortCode}`} target="_blank">
-                                <div className="flex items-center justify-between gap-3 p-4 bg-black rounded-2xl cursor-pointer hover:bg-gray-800 transition-colors">
+                            {isSignedIn ? (
+                                <Link href={`/analytics/${shortUrlData.data?.shortCode}`} target="_blank">
+                                    <div className="flex items-center justify-between gap-3 p-4 bg-black rounded-2xl cursor-pointer hover:bg-gray-800 transition-colors">
+                                        <div className="flex gap-4 items-center">
+                                            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                                                <Link2 className="w-4 h-4 text-black" />
+                                            </div>
+
+                                            <div className="flex-1">
+                                                <div className="text-white font-medium">Link encurtado</div>
+                                                <div className="text-gray-300 text-sm font-mono">{shortUrlData.data?.shortUrl}</div>
+                                            </div>
+                                        </div>
+
+                                        <ExternalLinkIcon />
+                                    </div>
+                                </Link>
+                            ) : (
+                                <div className="flex items-center gap-3 p-4 bg-black rounded-2xl">
                                     <div className="flex gap-4 items-center">
                                         <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                                             <Link2 className="w-4 h-4 text-black" />
                                         </div>
 
                                         <div className="flex-1">
-                                            <div className="text-white font-medium">Link encurtado</div>
+                                            <div className="text-white font-medium">Link público criado</div>
                                             <div className="text-gray-300 text-sm font-mono">{shortUrlData.data?.shortUrl}</div>
                                         </div>
                                     </div>
-
-                                    <ExternalLinkIcon />
                                 </div>
-                            </Link>
+                            )}
 
                             <div className="flex gap-2">
                                 <Button
