@@ -1,0 +1,42 @@
+name: Update Case Study Images
+
+on:
+  push:
+    branches: [master]
+    paths: 
+      - 'CASE_STUDY.md'
+      - 'public/**'
+
+jobs:
+  update-images:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Update image paths in CASE_STUDY.md
+      run: |
+        # Substitui paths locais por URLs do GitHub (usa branch atual automaticamente)
+        sed -i 's|<img src="./public/|<img src="https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/public/|g' CASE_STUDY.md
+        sed -i 's|<img src="public/|<img src="https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/public/|g' CASE_STUDY.md
+    
+    - name: Check for changes
+      id: verify-changed-files
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Commit changes
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add CASE_STUDY.md
+        git commit -m "🤖 Auto-update image URLs in CASE_STUDY.md"
+        git push
