@@ -6,6 +6,7 @@ on:
     paths: 
       - 'CASE_STUDY.md'
       - 'public/**'
+  workflow_dispatch: # Permite execução manual
 
 jobs:
   update-images:
