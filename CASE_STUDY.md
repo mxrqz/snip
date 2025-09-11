@@ -14,7 +14,7 @@
 
 ## **Arquitetura do Sistema**
 
-<img src="./public/fluxograma-snip-1.png" />
+<img src="https://raw.githubusercontent.com/mxrqz/snip/master/public/fluxograma-snip-1.png" />
 
 ---
 
@@ -22,15 +22,15 @@
 
 ### **1. Encurtamento de URL**
 
-<img src="./public/fluxograma-snip-2.png" />
+<img src="https://raw.githubusercontent.com/mxrqz/snip/master/public/fluxograma-snip-2.png" />
 
 ### **2. Redirecionamento de Link**
 
-<img src="./public/fluxograma-snip-3.png" />
+<img src="https://raw.githubusercontent.com/mxrqz/snip/master/public/fluxograma-snip-3.png" />
 
 ### **3. Dashboard e Analytics**
 
-<img src="./public/fluxograma-snip-4.png" />
+<img src="https://raw.githubusercontent.com/mxrqz/snip/master/public/fluxograma-snip-4.png" />
 
 ---
 
