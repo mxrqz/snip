@@ -155,7 +155,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6 flex flex-col items-center w-full">
+    <div className="min-h-screen bg-background px-5 py-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 flex flex-col items-center w-full">
       <div className="max-w-7xl mx-auto space-y-6 w-full">
 
         {/* Header */}

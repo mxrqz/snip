@@ -22,7 +22,7 @@ export default function Home() {
   });
 
   return (
-    <main className={`bg-background relative flex flex-col gap-32 md:gap-48 items-center w-full md:max-w-7xl md:mx-auto py-20 px-10 md:px-0`}>
+    <main className={`bg-background relative flex flex-col gap-32 md:gap-48 items-center w-full md:max-w-7xl md:mx-auto py-20 px-5 sm:px-8 md:px-12 lg:px-16 xl:px-20`}>
       <Hero />
       <HowItWorks />
       <Features />

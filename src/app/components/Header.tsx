@@ -34,7 +34,7 @@ export function Header() {
 
 
   return (
-    <header className="w-full border-b [border-image:linear-gradient(90deg,#fff0,#fff3_25%,#fff6_75%,#fff0)_1] flex py-4 sticky top-0 z-10 bg-background/30 backdrop-blur-sm px-10 md:px-0 standalone:pt-16">
+    <header className="w-full border-b [border-image:linear-gradient(90deg,#fff0,#fff3_25%,#fff6_75%,#fff0)_1] flex py-4 sticky top-0 z-10 bg-background/30 backdrop-blur-sm px-5 sm:px-8 md:px-12 lg:px-16 xl:px-20 standalone:pt-16">
       <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
 
         <div className="flex items-center">
